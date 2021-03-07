@@ -8,4 +8,3 @@ Repository for graduate design in 2021
 + pst_parse - Phrase Structure Parsing or Constituent Parsing
 + lm - Language Modeling
 + ner - Named Entity Extraction and Relation Extraction
-
