@@ -26,4 +26,3 @@ path="test.csv"
 test=splitsentence(path)
 tensor,tokenizer=tokenize(test)
 print(tokenizer.word_index)
-print(tensor)
