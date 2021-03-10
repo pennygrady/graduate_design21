@@ -1,6 +1,7 @@
 import io
 import re
 import tensorflow as tf
+import numpy as np
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 def splitsentence(file_path):
@@ -25,4 +26,19 @@ def tokenize(input):
 path="test.csv"
 test=splitsentence(path)
 tensor,tokenizer=tokenize(test)
-print(tokenizer.word_index)
+text=np.array(tensor)
+word=tf.data.Dataset.from_tensor_slices(text)
+def split_input_target(chunk):
+    input_text=chunk[:-1]
+    target_text=chunk[1:]
+    return input_text,target_text
+dataset=word.map(split_input_target)
+
+BATCH_SIZE=64
+BUFFER_SIZE=10000
+dataset=dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE,drop_remainder=True)
+print(dataset)
+
+total_words=len(tokenizer.word_index)+1
+
+
