@@ -28,17 +28,33 @@ test=splitsentence(path)
 tensor,tokenizer=tokenize(test)
 text=np.array(tensor)
 word=tf.data.Dataset.from_tensor_slices(text)
+print(word)
 def split_input_target(chunk):
     input_text=chunk[:-1]
     target_text=chunk[1:]
     return input_text,target_text
 dataset=word.map(split_input_target)
-
+print(dataset)
 BATCH_SIZE=64
 BUFFER_SIZE=10000
 dataset=dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE,drop_remainder=True)
 print(dataset)
 
 total_words=len(tokenizer.word_index)+1
+embedding_dim=256
+rnn_units=1024
+model=tf.keras.Sequential([
+    tf.keras.layers.Embedding(total_words,embedding_dim,batch_input_shape=[BATCH_SIZE,None]),
+    tf.keras.layers.GRU(rnn_units,
+                 return_sequences=True),
+    tf.keras.layers.Dense(total_words)
+])
+for input_example_batch,target_example_batch in dataset.take(1):
+    example_batch_prediction=model(input_example_batch)
+    print(example_batch_prediction.shape,"#(batch_size,sequence_length,vocab_size)")
 
+example_batch_loss=tf.keras.losses.sparse_categorical_crossentropy(target_example_batch,example_batch_prediction,from_logits=True)
+print("Prediction shape: ", example_batch_prediction.shape, " # (batch_size, sequence_length, vocab_size)")
+print("scalar_loss:      ", example_batch_loss.numpy().mean())
 
+model.compile(optimizer='adam',loss=tf.keras.losses.sparse_categorical_crossentropy)
