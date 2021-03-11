@@ -1,5 +1,6 @@
 import io
 import re
+import os
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing.text import Tokenizer
@@ -35,7 +36,7 @@ def split_input_target(chunk):
     return input_text,target_text
 dataset=word.map(split_input_target)
 print(dataset)
-BATCH_SIZE=64
+BATCH_SIZE=16
 BUFFER_SIZE=10000
 dataset=dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE,drop_remainder=True)
 print(dataset)
@@ -58,3 +59,12 @@ print("Prediction shape: ", example_batch_prediction.shape, " # (batch_size, seq
 print("scalar_loss:      ", example_batch_loss.numpy().mean())
 
 model.compile(optimizer='adam',loss=tf.keras.losses.sparse_categorical_crossentropy)
+checkpoint_dir='./traning_checkpoints'
+checkpoint_prefix=os.path.join(checkpoint_dir,"ckpt_{epoch}")
+
+checkpoint_callback=tf.keras.callbacks.ModelCheckpoint(
+    filepath=checkpoint_prefix,
+    save_weights_only=True
+)
+Epoch=10
+history=model.fit(dataset,epochs=Epoch,callbacks=[checkpoint_callback])
