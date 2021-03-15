@@ -12,8 +12,8 @@ def splitsentence(file_path):
         row = re.sub(r"=[\s\S]*=", "", row)
         row = re.sub(r"[^a-zA-Z?.!,¿]+", " ", row)
         row = re.sub(r"[ ]+", " ", row)
-        generate = row.split('.')
-        for line in generate:
+        row=re.split(r"[?.!¿]",row)
+        for line in row:
             if line != " " and line != "":
                 print(line)
                 input.append(line)
@@ -40,7 +40,6 @@ BATCH_SIZE=16
 BUFFER_SIZE=10000
 dataset=dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE,drop_remainder=True)
 print(dataset)
-
 total_words=len(tokenizer.word_index)+1
 embedding_dim=256
 rnn_units=1024
